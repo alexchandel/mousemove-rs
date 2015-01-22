@@ -1,0 +1,16 @@
+[package]
+
+name = "mousemove"
+version = "0.0.1"
+authors = ["Alex Chandel <alexchandel@gmail.com>"]
+description = "Send a mouse movement or click event to the system."
+keywords = ["mouse", "gui", "scripting"]
+repository = "https://github.com/alexchandel/mousemove-rs"
+readme = "README.md"
+license = "Unlicense"
+
+[dependencies.user32-sys]
+path = "../user32-sys"
+
+[dependencies.winapi]
+path = "../winapi-rs"
