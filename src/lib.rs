@@ -17,7 +17,7 @@ mod platform {
 #[cfg(target_os = "windows")]
 mod platform {
 	extern crate winapi;
-	extern crate "user32-sys" as user32_sys;
+	extern crate user32 as user32_sys;
 
 	use std::mem::{size_of};
 	use self::winapi::{c_int, LONG};
