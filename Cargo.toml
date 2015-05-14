@@ -1,7 +1,7 @@
 [package]
 
 name = "mousemove"
-version = "0.0.1"
+version = "0.0.2"
 authors = ["Alex Chandel <alexchandel@gmail.com>"]
 description = "Send a mouse movement or click event to the system."
 keywords = ["mouse", "gui", "scripting"]
