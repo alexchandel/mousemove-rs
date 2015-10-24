@@ -19,13 +19,13 @@ mod platform {
 	extern crate winapi;
 	extern crate user32 as user32_sys;
 
-	use std::mem::{size_of};
+	use std::mem::{size_of, zeroed};
 	use self::winapi::{c_int, LONG};
 	use self::winapi::{MOUSEEVENTF_ABSOLUTE, MOUSEEVENTF_MOVE};
 	use self::winapi::{MOUSEEVENTF_LEFTDOWN, MOUSEEVENTF_LEFTUP};
 	use self::winapi::{MOUSEEVENTF_RIGHTDOWN, MOUSEEVENTF_RIGHTUP};
 	use self::winapi::{MOUSEEVENTF_MIDDLEDOWN, MOUSEEVENTF_MIDDLEUP};
-	use self::winapi::{INPUT, LPINPUT, MOUSEINPUT, INPUT_MOUSE};
+	use self::winapi::{INPUT, MOUSEINPUT, INPUT_MOUSE};
 	use self::winapi::{SM_CXSCREEN, SM_CYSCREEN};
 	use self::user32_sys::{SendInput, GetSystemMetrics};
 
@@ -38,17 +38,19 @@ mod platform {
 			// Windows absolute is [0, 65536);
 			let xf = (((x as u64)*0x10000)/(GetSystemMetrics(SM_CXSCREEN) as u64)) as LONG;
 			let yf = (((y as u64)*0x10000)/(GetSystemMetrics(SM_CYSCREEN) as u64)) as LONG;
-			SendInput(1, &mut INPUT {
+			let mut input = INPUT {
 				type_: INPUT_MOUSE,
-				union_: MOUSEINPUT {
-					dx: xf,
-					dy: yf,
-					mouseData: 0,
-					dwFlags: MOUSEEVENTF_ABSOLUTE|MOUSEEVENTF_MOVE,
-					time: 0,
-					dwExtraInfo: 0,
-				}
-			} as LPINPUT,size_of::<INPUT>() as c_int)
+				u: zeroed(),
+			};
+			*input.mi_mut() = MOUSEINPUT {
+				dx: xf,
+				dy: yf,
+				mouseData: 0,
+				dwFlags: MOUSEEVENTF_ABSOLUTE|MOUSEEVENTF_MOVE,
+				time: 0,
+				dwExtraInfo: 0,
+			};
+			SendInput(1, &mut input, size_of::<INPUT>() as c_int)
 		};
 	}
 
@@ -58,17 +60,20 @@ mod platform {
 			Button::Right => MOUSEEVENTF_RIGHTDOWN,
 			Button::Middle => MOUSEEVENTF_MIDDLEDOWN,
 		};
-		unsafe {SendInput(1, &mut INPUT {
+		unsafe {
+		let mut input = INPUT {
 			type_: INPUT_MOUSE,
-			union_: MOUSEINPUT {
-				dx: 0,
-				dy: 0,
-				mouseData: 0,
-				dwFlags: flag,
-				time: 0,
-				dwExtraInfo: 0,
-			}
-		} as LPINPUT,size_of::<INPUT>() as c_int)};
+			u: zeroed(),
+		};
+		*input.mi_mut() = MOUSEINPUT {
+			dx: 0,
+			dy: 0,
+			mouseData: 0,
+			dwFlags: flag,
+			time: 0,
+			dwExtraInfo: 0,
+		};
+		SendInput(1, &mut input, size_of::<INPUT>() as c_int)};
 	}
 
 	pub fn release_mouse(b: Button) {
@@ -77,17 +82,20 @@ mod platform {
 			Button::Right => MOUSEEVENTF_RIGHTUP,
 			Button::Middle => MOUSEEVENTF_MIDDLEUP,
 		};
-		unsafe {SendInput(1, &mut INPUT {
+		unsafe {
+		let mut input = INPUT {
 			type_: INPUT_MOUSE,
-			union_: MOUSEINPUT {
-				dx: 0,
-				dy: 0,
-				mouseData: 0,
-				dwFlags: flag,
-				time: 0,
-				dwExtraInfo: 0,
-			}
-		} as LPINPUT,size_of::<INPUT>() as c_int)};
+			u: zeroed(),
+		};
+		*input.mi_mut() = MOUSEINPUT {
+			dx: 0,
+			dy: 0,
+			mouseData: 0,
+			dwFlags: flag,
+			time: 0,
+			dwExtraInfo: 0,
+		};
+		SendInput(1, &mut input, size_of::<INPUT>() as c_int)};
 	}
 
 	pub fn move_click(x: usize, y: usize) {
